@@ -44,9 +44,14 @@ object NativeEngine {
     
     external fun startSocks5Server(port: Int, bindAddrs: Array<String>): String
     external fun stopSocks5Server(): String
-    external fun setSocks5Auth(user: String, pass: String): String
+    private external fun nativeSetSocks5Auth(user: String, pass: String): String
     external fun isSocks5ServerRunning(): Boolean
     external fun getSocks5Stats(): String
+
+    /** Accepts either a legacy plaintext password or a Keystore envelope. */
+    fun setSocks5Auth(user: String, pass: String): String {
+        return nativeSetSocks5Auth(user, CredentialCrypto.decrypt(pass))
+    }
 
     // [自檢/診斷] 安全讀取 native 統計；程式庫未載入時回傳說明字串
     fun safeGetStats(): String {
