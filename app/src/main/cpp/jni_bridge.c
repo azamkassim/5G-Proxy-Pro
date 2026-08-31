@@ -170,7 +170,7 @@ static const JNINativeMethod gMethods[] = {
     {"nativeRegisterInstance", "()V", (void *)native_register_instance},
     {"startSocks5Server", "(I[Ljava/lang/String;)Ljava/lang/String;", (void *)native_start_socks5_server},
     {"stopSocks5Server", "()Ljava/lang/String;", (void *)native_stop_socks5_server},
-    {"setSocks5Auth", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", (void *)native_set_socks5_auth},
+    {"nativeSetSocks5Auth", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", (void *)native_set_socks5_auth},
     {"isSocks5ServerRunning", "()Z", (void *)native_is_socks5_server_running},
     {"getSocks5Stats", "()Ljava/lang/String;", (void *)native_get_socks5_stats},
 };

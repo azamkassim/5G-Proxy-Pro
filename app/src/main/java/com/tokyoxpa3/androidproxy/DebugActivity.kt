@@ -255,6 +255,12 @@ class DebugActivity : Activity() {
 
         // Auth Config (可選帳密，留空 = 無認證)
         val authPrefs = getSharedPreferences("proxy_config", Context.MODE_PRIVATE)
+        val storedAuthPass = authPrefs.getString("auth_pass", "") ?: ""
+        val resolvedAuthPass = CredentialCrypto.decrypt(storedAuthPass)
+        if (storedAuthPass.isNotEmpty() && !CredentialCrypto.isEncrypted(storedAuthPass)) {
+            // One-time migration from legacy plaintext. Encryption failure returns empty, failing closed.
+            authPrefs.edit().putString("auth_pass", CredentialCrypto.migrateIfNeeded(storedAuthPass)).apply()
+        }
         val authLayout = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             setPadding(0, 0, 0, 16)
@@ -299,7 +305,7 @@ class DebugActivity : Activity() {
                 setTypeface(null, android.graphics.Typeface.BOLD)
             }
             authPassInput = EditText(context).apply {
-                setText(authPrefs.getString("auth_pass", "") ?: "")
+                setText(resolvedAuthPass)
                 hint = getString(R.string.auth_pass_hint)
                 inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
                 gravity = Gravity.CENTER
@@ -492,12 +498,14 @@ class DebugActivity : Activity() {
     private fun applyAuthChange() {
         val user = authUserInput.text.toString().trim()
         val pass = authPassInput.text.toString()
+        val encryptedPass = CredentialCrypto.encrypt(pass)
         getSharedPreferences("proxy_config", Context.MODE_PRIVATE)
             .edit()
             .putString("auth_user", user)
-            .putString("auth_pass", pass)
+            .putString("auth_pass", encryptedPass)
             .apply()
         if (Socks5ProxyService.isServiceRunning) {
+            // Live path can use the in-memory plaintext; NativeEngine also accepts encrypted envelopes.
             NativeEngine.setSocks5Auth(user, pass)
             Toast.makeText(this, getString(R.string.auth_applied_live), Toast.LENGTH_SHORT).show()
         }
@@ -546,7 +554,7 @@ class DebugActivity : Activity() {
         getSharedPreferences("proxy_config", Context.MODE_PRIVATE)
             .edit()
             .putString("auth_user", authUserInput.text.toString().trim())
-            .putString("auth_pass", authPassInput.text.toString())
+            .putString("auth_pass", CredentialCrypto.encrypt(authPassInput.text.toString()))
             .apply()
 
         isRunning = true
@@ -665,7 +673,8 @@ class DebugActivity : Activity() {
         sb.append("Port: ").append(port).append("\n")
         val prefs = getSharedPreferences("proxy_config", Context.MODE_PRIVATE)
         val user = prefs.getString("auth_user", "") ?: ""
-        val pass = prefs.getString("auth_pass", "") ?: ""
+        val storedPass = prefs.getString("auth_pass", "") ?: ""
+        val pass = CredentialCrypto.decrypt(storedPass)
         val authOn = user.isNotEmpty() && pass.isNotEmpty()
         sb.append("Auth: ").append(
             if (authOn) "enabled (user=$user, pass=${mask(pass)})" else "disabled"
