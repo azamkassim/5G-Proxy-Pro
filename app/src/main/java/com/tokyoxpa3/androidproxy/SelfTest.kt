@@ -31,6 +31,9 @@ object SelfTest {
             val steps = mutableListOf<Step>()
             var socket: Socket? = null
             try {
+                // authPass may be the persisted Keystore envelope when invoked from diagnostics.
+                val resolvedAuthPass = CredentialCrypto.decrypt(authPass)
+
                 // 0. TCP 連線到 loopback（偵測「proxy 沒在聽」）
                 socket = Socket()
                 socket.soTimeout = TIMEOUT_MS
@@ -44,7 +47,7 @@ object SelfTest {
 
                 val input = socket.getInputStream()
                 val output = socket.getOutputStream()
-                val authEnabled = authUser.isNotEmpty() && authPass.isNotEmpty()
+                val authEnabled = authUser.isNotEmpty() && resolvedAuthPass.isNotEmpty()
 
                 // 1. SOCKS5 握手（greeting）
                 val method = if (authEnabled) 0x02 else 0x00
@@ -68,7 +71,7 @@ object SelfTest {
                 // 2. RFC1929 帳密認證（僅在啟用認證時）
                 if (authEnabled) {
                     val userBytes = authUser.toByteArray(Charsets.UTF_8)
-                    val passBytes = authPass.toByteArray(Charsets.UTF_8)
+                    val passBytes = resolvedAuthPass.toByteArray(Charsets.UTF_8)
                     val req = ByteArray(3 + userBytes.size + passBytes.size)
                     req[0] = 0x01
                     req[1] = userBytes.size.toByte()
