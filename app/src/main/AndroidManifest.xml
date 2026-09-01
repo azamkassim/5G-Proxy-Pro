@@ -41,6 +41,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".PocketBridgeConnectActivity"
+            android:exported="false"
+            android:label="@string/pocketbridge_title" />
+
         <!--
           Narrow, user-controlled integration boundary: other apps may explicitly
           hand files/text/links to PocketBridge through Android's Share Sheet.
