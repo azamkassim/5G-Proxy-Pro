@@ -7,7 +7,7 @@ object PocketBridgeShareNames {
         val cleaned = input.orEmpty()
             .replace(Regex("[\\u0000-\\u001F\\u007F]"), "")
             .replace('/', '_')
-            .replace('\\\\', '_')
+            .replace(92.toChar(), '_')
             .trim()
             .trim('.')
             .ifBlank { fallback }
