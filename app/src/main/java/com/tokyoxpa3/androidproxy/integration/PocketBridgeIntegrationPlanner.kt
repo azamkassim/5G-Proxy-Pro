@@ -34,13 +34,18 @@ class PocketBridgeIntegrationPlanner(
         }
 
         val availableOptIn = registry.all().filter { descriptor ->
+            if (descriptor.enabledByDefault) return@filter false
+
             when (descriptor.dependency) {
+                // Built-in but intentionally disabled modules such as SFTP must
+                // still be visible to the user as optional session capabilities.
+                AdapterDependency.CORE,
+                AdapterDependency.ANDROID_FRAMEWORK -> true
+
                 AdapterDependency.OPTIONAL_APP,
-                AdapterDependency.OPTIONAL_PRIVILEGED -> descriptor.id in installedOptionalIds && !descriptor.enabledByDefault
+                AdapterDependency.OPTIONAL_PRIVILEGED -> descriptor.id in installedOptionalIds
 
                 AdapterDependency.EXTERNAL_CONSUMER -> true
-                AdapterDependency.CORE,
-                AdapterDependency.ANDROID_FRAMEWORK -> false
             }
         }
 
