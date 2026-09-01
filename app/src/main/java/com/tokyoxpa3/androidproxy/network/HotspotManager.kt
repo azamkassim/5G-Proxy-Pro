@@ -25,6 +25,41 @@ object HotspotManager {
         "192.168.42."
     )
 
+    /**
+     * Safe IPv4 addresses on local-device transports that PocketBridge may
+     * bind listeners to. Cellular/rmnet style interfaces are never returned.
+     *
+     * This intentionally returns concrete addresses rather than 0.0.0.0 so a
+     * local file-sharing listener cannot accidentally become reachable through
+     * the phone's cellular/public interface.
+     */
+    fun getLanIPv4Addresses(context: Context): List<String> {
+        val result = linkedSetOf<String>()
+        getCurrentWifiIP(context)?.let(result::add)
+        getWiFiHotspotIP(context)?.let(result::add)
+        getUsbTetherIP(context)?.let(result::add)
+
+        try {
+            val interfaces = JavaNetworkInterface.getNetworkInterfaces()
+            if (interfaces != null) {
+                for (iface in interfaces) {
+                    if (!iface.isUp || iface.isLoopback) continue
+                    if (isCellularInterface(iface.name) || !isAllowedLanIface(iface.name)) continue
+                    val addresses = iface.inetAddresses ?: continue
+                    for (address in addresses) {
+                        if (address !is Inet4Address) continue
+                        if (address.isLoopbackAddress || address.isLinkLocalAddress || address.isAnyLocalAddress) continue
+                        address.hostAddress?.let(result::add)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.w(TAG, "Unable to enumerate extra LAN addresses", e)
+        }
+
+        return result.toList()
+    }
+
     fun getHotspotIP(context: Context): String? {
         return getWiFiHotspotIP(context)
     }
@@ -88,7 +123,8 @@ object HotspotManager {
                 if (isUsbTetherIface(iface.name)) return ip
             }
             // 最後一搏：USB 分享常用網段
-            for (iface in interfaces) {
+            val interfacesAgain = JavaNetworkInterface.getNetworkInterfaces() ?: return null
+            for (iface in interfacesAgain) {
                 if (!iface.isUp || iface.isLoopback) continue
                 if (isCellularInterface(iface.name)) continue
                 val addresses = iface.inetAddresses ?: continue
@@ -126,6 +162,23 @@ object HotspotManager {
         return lower.contains("rndis") ||
             lower.contains("usb") ||
             lower.contains("ncm")
+    }
+
+    private fun isAllowedLanIface(name: String): Boolean {
+        val lower = name.lowercase()
+        return lower.startsWith("wlan") ||
+            lower.startsWith("wl") ||
+            lower.startsWith("ap") ||
+            lower.startsWith("sap") ||
+            lower.startsWith("swlan") ||
+            lower.startsWith("softap") ||
+            lower.startsWith("rndis") ||
+            lower.startsWith("usb") ||
+            lower.startsWith("ncm") ||
+            lower.startsWith("eth") ||
+            lower.startsWith("bnep") ||
+            lower.startsWith("p2p") ||
+            lower.startsWith("up")
     }
 
     private fun getInterfaceIPv4(ifaceName: String): String? {

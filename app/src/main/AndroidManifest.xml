@@ -19,6 +19,17 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
         android:usesCleartextTraffic="true">
+
+        <!--
+          Internal initializer only. The provider exposes no data; it keeps the
+          QuickDrop sidecar derived from the existing foreground proxy service
+          state, so there is still one Android service lifecycle and one tap.
+        -->
+        <provider
+            android:name=".PocketBridgeRuntimeProvider"
+            android:authorities="${applicationId}.pocketbridge.runtime"
+            android:exported="false"
+            android:initOrder="100" />
         
         <activity
             android:name=".DebugActivity"
@@ -29,6 +40,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".PocketBridgeConnectActivity"
+            android:exported="false"
+            android:label="@string/pocketbridge_title" />
 
         <!--
           Narrow, user-controlled integration boundary: other apps may explicitly
