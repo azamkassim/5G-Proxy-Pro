@@ -19,6 +19,14 @@ class PocketBridgeIntegrationPlannerTest {
     }
 
     @Test
+    fun `built in SFTP module is visible but not auto enabled`() {
+        val plan = PocketBridgeIntegrationPlanner().plan(emptySet())
+
+        assertFalse(plan.enabled.any { it.id == "drive.sftp" })
+        assertTrue(plan.availableOptIn.any { it.id == "drive.sftp" })
+    }
+
+    @Test
     fun `installed privileged adapter remains opt in`() {
         val plan = PocketBridgeIntegrationPlanner().plan(
             setOf("moe.shizuku.privileged.api")
