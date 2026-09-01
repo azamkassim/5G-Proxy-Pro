@@ -105,6 +105,14 @@ object BuiltInPocketBridgeAdapters {
             enabledByDefault = true
         ),
         PocketBridgeAdapterDescriptor(
+            id = "discovery.local",
+            displayName = "Local Device Discovery",
+            capabilities = setOf(PocketBridgeCapability.DEVICE_DISCOVERY),
+            dependency = AdapterDependency.CORE,
+            trustLevel = AdapterTrustLevel.LOCAL_CORE,
+            enabledByDefault = true
+        ),
+        PocketBridgeAdapterDescriptor(
             id = "portal.quickdrop",
             displayName = "QuickDrop Browser Portal",
             capabilities = setOf(
@@ -121,8 +129,27 @@ object BuiltInPocketBridgeAdapters {
             enabledByDefault = true
         ),
         PocketBridgeAdapterDescriptor(
+            id = "automation.recipe-engine",
+            displayName = "Automation Recipe Engine",
+            capabilities = setOf(PocketBridgeCapability.AUTOMATION_RECIPE),
+            dependency = AdapterDependency.CORE,
+            trustLevel = AdapterTrustLevel.LOCAL_CORE,
+            enabledByDefault = true
+        ),
+        PocketBridgeAdapterDescriptor(
             id = "drive.sftp",
             displayName = "Pocket Drive SFTP",
+            capabilities = setOf(
+                PocketBridgeCapability.SHARED_FOLDER,
+                PocketBridgeCapability.TRANSFER_HISTORY
+            ),
+            dependency = AdapterDependency.CORE,
+            trustLevel = AdapterTrustLevel.LOCAL_CORE,
+            enabledByDefault = false
+        ),
+        PocketBridgeAdapterDescriptor(
+            id = "drive.webdav",
+            displayName = "Pocket Drive WebDAV",
             capabilities = setOf(
                 PocketBridgeCapability.SHARED_FOLDER,
                 PocketBridgeCapability.TRANSFER_HISTORY
@@ -136,7 +163,8 @@ object BuiltInPocketBridgeAdapters {
             displayName = "Nextcloud",
             capabilities = setOf(
                 PocketBridgeCapability.CLOUD_MIRROR,
-                PocketBridgeCapability.DOCUMENT_PROVIDER
+                PocketBridgeCapability.DOCUMENT_PROVIDER,
+                PocketBridgeCapability.AUTOMATION_RECIPE
             ),
             dependency = AdapterDependency.OPTIONAL_APP,
             trustLevel = AdapterTrustLevel.OPTIONAL_INTEGRATION,
@@ -145,7 +173,10 @@ object BuiltInPocketBridgeAdapters {
         PocketBridgeAdapterDescriptor(
             id = "app.termux",
             displayName = "Termux Recipes",
-            capabilities = setOf(PocketBridgeCapability.DEVELOPER_RECIPE),
+            capabilities = setOf(
+                PocketBridgeCapability.AUTOMATION_RECIPE,
+                PocketBridgeCapability.DEVELOPER_RECIPE
+            ),
             dependency = AdapterDependency.OPTIONAL_APP,
             trustLevel = AdapterTrustLevel.OPTIONAL_INTEGRATION,
             packageNames = setOf("com.termux")
@@ -165,7 +196,10 @@ object BuiltInPocketBridgeAdapters {
         PocketBridgeAdapterDescriptor(
             id = "app.consoleflow",
             displayName = "ConsoleFlow Recipes",
-            capabilities = setOf(PocketBridgeCapability.DEVELOPER_RECIPE),
+            capabilities = setOf(
+                PocketBridgeCapability.AUTOMATION_RECIPE,
+                PocketBridgeCapability.DEVELOPER_RECIPE
+            ),
             dependency = AdapterDependency.OPTIONAL_APP,
             trustLevel = AdapterTrustLevel.OPTIONAL_INTEGRATION,
             packageNames = setOf("space.karrarnazim.ConsoleFlow")
