@@ -100,4 +100,11 @@ Also set this App\'s battery saver to \"No restrictions\".</string>
     <string name="self_test_fail">❌ Self test failed</string>
     <string name="diagnostics_title">5G Proxy Pro Diagnostics</string>
     <string name="diagnostics_copied">Diagnostics copied to clipboard</string>
+
+    <string name="pocketbridge_share_target">PocketBridge</string>
+    <string name="pocketbridge_folder_required">Choose a folder once to create the PocketBridge Inbox.</string>
+    <string name="pocketbridge_folder_permission_failed">PocketBridge could not keep access to that folder. Please choose another folder.</string>
+    <string name="pocketbridge_import_success">PocketBridge received %1$d item(s).</string>
+    <string name="pocketbridge_import_partial">PocketBridge received %1$d item(s); %2$d failed.</string>
+    <string name="pocketbridge_import_failed">PocketBridge could not import this share.</string>
 </resources>

@@ -29,6 +29,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+          Narrow, user-controlled integration boundary: other apps may explicitly
+          hand files/text/links to PocketBridge through Android's Share Sheet.
+          The receiver only reads URIs granted with that share and writes them
+          into the user-selected SAF tree; no broad storage permission is used.
+        -->
+        <activity
+            android:name=".ShareReceiverActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="@string/pocketbridge_share_target"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
         
         <service
             android:name=".Socks5ProxyService"
