@@ -12,6 +12,7 @@ enum class PocketBridgeCapability {
     FILE_DROP,
     SHARED_FOLDER,
     BROWSER_PORTAL,
+    DEVICE_DISCOVERY,
     CLIPBOARD_BOARD,
     LINK_HANDOFF,
     OPEN_WITH,
